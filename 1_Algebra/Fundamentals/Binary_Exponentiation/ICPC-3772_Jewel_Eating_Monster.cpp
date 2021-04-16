@@ -1,4 +1,4 @@
-#include <bits/stdc++.h>
+#include "bits/stdc++.h"
 using namespace std;
  
 //CODED BY SUMIT KUMAR PRAJAPATI
@@ -50,21 +50,22 @@ ll invModulo(ll a,ll p){
 } 
  
 void solve(){
+
 	
 	ll x,a,n,c;
 	cin>>x>>a>>n>>c;
-	if(x==0){
+	if(x==0 && a==0 && n==0 && c==0){
 		flag=false;
 		return;
 	}
-	x--;
-	ll res=(powerfunction(a,n,c)*x)%c;
-	ll sub=powerfunction(a,n-1,c);
-	sub=(sub+c-1)%c;
-	sub=(a*sub)%c;
-	sub=(sub*invModulo(a-1,c))%c;
-	res=(res+c-sub)%c;
-	cout<<res<<'\n';
+    //f=x*a^n - a*(a^n - 1)/(a-1)
+	ll res=powerfunction(a,n,c);
+    ll sub=(res-1+c)%c;
+    res=(res*x)%c;
+    sub=(sub*a)%c;
+    sub=(sub*invModulo(a-1,c))%c;
+    ll ans=(res-sub+c)%c;
+	cout<<ans<<'\n';
 
 
   
@@ -74,14 +75,10 @@ void solve(){
  
  int main() {
 
-  #ifndef ONLINE_JUDGE
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-   #else
-       ios_base::sync_with_stdio(false);
-      cin.tie(NULL);
-        cout.tie(NULL);
-   #endif
+  
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    
 
   srand(time(0));	
 
