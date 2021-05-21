@@ -1,3 +1,0 @@
-Remember this technique.
-Used to calculate (a*b)%m quickly for large a and b as far as i know.
-Do checkout if needed.
