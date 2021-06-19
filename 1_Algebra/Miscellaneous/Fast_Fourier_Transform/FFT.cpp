@@ -23,7 +23,7 @@ typedef pair<ll, ll>  pl;
 const int INF=1e9;
 const int MX=1e5+5;
 const int MD=1e9+7;
-const int MDL=99824453;
+const int MDL=998244353;
 auto time0 = curtime;
 
 typedef complex<double> Complex;
@@ -103,7 +103,7 @@ vector<int> multiply(vector<int> const& a, vector<int> const& b) {
 
  
 void solve(){
-    vector<int>a{5,2,1,0,0,0},b{3,1,1,3,1,1};
+    vector<int>a{1,1},b{1,1};
     vector<int>res=multiply(a,b);
     int i=0;
     for(auto &x:res)

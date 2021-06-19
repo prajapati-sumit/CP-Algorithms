@@ -25,7 +25,7 @@ using namespace std;
 #define INF                 1'000'000'000
 #define MD                  1'000'000'007
 #define MDL                 998244353
-#define MX                  200'05
+#define MX                  100'0005
 
 
 auto time0 = curtime;
@@ -34,98 +34,55 @@ default_random_engine generator(rd());
 uniform_int_distribution<ull> distribution(0,0xFFFFFFFFFFFFFFFF);
 
 //Is testcase present?
+ 
+ 
+ll segm[4*MX];
+const int nax=1e6+1; 
 
-int segm[4*MX];
-int a[MX];
-
- 
-void buildtree(int cur,int start,int end){
-     if(start==end){
-        segm[cur]=(a[start]==0);
-        return;
-     }
-     int mid=(start+end)>>1;
-     buildtree(cur<<1,start,mid);
-     buildtree((cur<<1)+1,mid+1,end);
-     //MERGING STEP
-     segm[cur]=segm[2*cur]+segm[2*cur+1];
-
- 
- 
- }
- int query(int cur,int start,int end,int qs,int qe){
-     if(start>=qs && end<=qe)
-         return segm[cur];
-     if(start>qe || end<qs)
-         return 0;          //INVALID RETURN 
-     int mid=(start+end)>>1;
-     int A=query(2*cur,start,mid,qs,qe);
-     int B=query(2*cur+1,mid+1,end,qs,qe);
-     int res=A+B;                //MERGING STEP  
- 
-     return res;
-}
-int query2(int cur,int start,int end,int x){
-    if(start==end){
-        if(x==1 && segm[cur]==1)
-            return start;
-        assert(false);
-    }
-    int A=segm[2*cur],B=segm[2*cur+1];
+ll query(int cur,int start,int end,int qs,int qe){
+    if(qs>qe)
+        return 0;
+    if(start>=qs && end<=qe)
+        return segm[cur];
+    if(start>qe || end<qs)
+        return 0;          //INVALID RETURN 
     int mid=(start+end)>>1;
-    if(A>=x)
-        return query2(2*cur,start,mid,x);
+    ll A=query(2*cur,start,mid,qs,qe);
+    ll B=query(2*cur+1,mid+1,end,qs,qe);
+    //MERGING STEP
+    ll res=A+B;  
 
-    return query2(2*cur+1,mid+1,end,x-A);
-
-
+    return res;
 }
-void update(int cur,int start,int end,int ind){
+void update(int cur,int start,int end,int ind,int val){
     if(start==ind && start==end){
-        segm[cur]=(a[ind]==0);
+        //DO UPDATE
+        segm[cur]+=val;
         return;
-
     }
     if(start>ind|| end<ind)
         return;          //OUT OF RANGE 
     int mid=(start+end)>>1;
-    update(cur<<1,start,mid,ind);
-    update((cur<<1)^1,mid+1,end,ind);
+    update(cur<<1,start,mid,ind,val);
+    update((cur<<1)^1,mid+1,end,ind,val);
     //MERGING STEP
     segm[cur]=segm[2*cur]+segm[2*cur+1];
+    
 }
-   
  
 void solve(){
-  
+    
+    ll sum=0;
     int n;
     cin>>n;
-    if(n==1){
-        cout<<"1\n";
-        return;
+    rep(i,n){
+        int a;
+        cin>>a;
+        sum+=query(1,1,nax,1,a-1);
+        update(1,1,nax,a,a);
     }
-    repe(i,n)
-        a[i]=0;
-    buildtree(1,1,n);
-    a[2]=1;
-    update(1,1,n,2);
-    int cur=2;
-    FOR(i,2,n){
-        int req=i;
-        int before=query(1,1,n,1,cur);
-        int total=n-i+1;
-        int indx=(i+before+1)%total;
-        if(indx==0)
-            indx=total;
-        indx=query2(1,1,n,indx);
-        a[indx]=i;
-        cur=indx;
-        update(1,1,n,indx);
-
-    }
-    repe(i,n)
-        cout<<a[i]<<" \n"[i==n];  
-  
+    cout<<sum<<'\n';
+    memset(segm,0,sizeof(segm));
  
 } 
  

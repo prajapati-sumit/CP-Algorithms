@@ -49,15 +49,10 @@ ll powerfunction(ll a,ll b,ll m){
 ll first(ll a,ll b){
 	lld res;
 	res=log10(1.0*a);
-	//cerr<<res<<'\n';
 	res*=(1.0*b);
-	//cerr<<res<<'\n';
 	res=res-floor(res);
-	//cerr<<res<<'\n';
 	res=pow(10,res);
-	//cerr<<res<<'\n';
 	res=res*100;
-	//cerr<<res<<'\n';
 	
 
 	return floor(res);
@@ -85,14 +80,10 @@ void solve(){
  
  int main() {
 
-  #ifndef ONLINE_JUDGE
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-   #else
-       ios_base::sync_with_stdio(false);
-      cin.tie(NULL);
-        cout.tie(NULL);
-   #endif
+     ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+      cout.tie(NULL);
+
 
   srand(time(0));	
 

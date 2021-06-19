@@ -25,8 +25,7 @@ using namespace std;
 #define INF                 1'000'000'000
 #define MD                  1'000'000'007
 #define MDL                 998244353
-#define MX                  200'05
-
+#define MX                  30005
 
 auto time0 = curtime;
 random_device rd;
@@ -34,98 +33,78 @@ default_random_engine generator(rd());
 uniform_int_distribution<ull> distribution(0,0xFFFFFFFFFFFFFFFF);
 
 //Is testcase present?
-
-int segm[4*MX];
+ 
+ 
+const int nax=1e6+1;
+int n;
 int a[MX];
+int lastPos[nax];
+int segm[4*MX]; 
+vector<pii>Q[MX];
+const int nax2=2e5+2;
+int ans[nax2];
 
- 
-void buildtree(int cur,int start,int end){
-     if(start==end){
-        segm[cur]=(a[start]==0);
-        return;
-     }
-     int mid=(start+end)>>1;
-     buildtree(cur<<1,start,mid);
-     buildtree((cur<<1)+1,mid+1,end);
-     //MERGING STEP
-     segm[cur]=segm[2*cur]+segm[2*cur+1];
-
- 
- 
- }
- int query(int cur,int start,int end,int qs,int qe){
-     if(start>=qs && end<=qe)
-         return segm[cur];
-     if(start>qe || end<qs)
-         return 0;          //INVALID RETURN 
-     int mid=(start+end)>>1;
-     int A=query(2*cur,start,mid,qs,qe);
-     int B=query(2*cur+1,mid+1,end,qs,qe);
-     int res=A+B;                //MERGING STEP  
- 
-     return res;
-}
-int query2(int cur,int start,int end,int x){
-    if(start==end){
-        if(x==1 && segm[cur]==1)
-            return start;
-        assert(false);
-    }
-    int A=segm[2*cur],B=segm[2*cur+1];
+int query(int cur,int start,int end,int qs,int qe){
+    if(start>=qs && end<=qe)
+        return segm[cur];
+    if(start>qe || end<qs)
+        return 0;          //INVALID RETURN 
     int mid=(start+end)>>1;
-    if(A>=x)
-        return query2(2*cur,start,mid,x);
+    int A=query(2*cur,start,mid,qs,qe);
+    int B=query(2*cur+1,mid+1,end,qs,qe);
+    //MERGING STEP
+    int res=A+B;
 
-    return query2(2*cur+1,mid+1,end,x-A);
-
-
+    return res;
 }
-void update(int cur,int start,int end,int ind){
+void update(int cur,int start,int end,int ind,int val){
     if(start==ind && start==end){
-        segm[cur]=(a[ind]==0);
+        //DO UPDATE
+        segm[cur]+=val;
         return;
-
     }
     if(start>ind|| end<ind)
         return;          //OUT OF RANGE 
     int mid=(start+end)>>1;
-    update(cur<<1,start,mid,ind);
-    update((cur<<1)^1,mid+1,end,ind);
+    update(cur<<1,start,mid,ind,val);
+    update((cur<<1)^1,mid+1,end,ind,val);
     //MERGING STEP
     segm[cur]=segm[2*cur]+segm[2*cur+1];
+    
 }
-   
  
 void solve(){
   
-    int n;
     cin>>n;
-    if(n==1){
-        cout<<"1\n";
-        return;
+    repe(i,n){
+        cin>>a[i];   
     }
-    repe(i,n)
-        a[i]=0;
-    buildtree(1,1,n);
-    a[2]=1;
-    update(1,1,n,2);
-    int cur=2;
-    FOR(i,2,n){
-        int req=i;
-        int before=query(1,1,n,1,cur);
-        int total=n-i+1;
-        int indx=(i+before+1)%total;
-        if(indx==0)
-            indx=total;
-        indx=query2(1,1,n,indx);
-        a[indx]=i;
-        cur=indx;
-        update(1,1,n,indx);
+    rep(i,nax)
+        lastPos[i]=-1;
+    int q;
+    cin>>q;
+    int l,r;       
+    repe(i,q){
+        cin>>l>>r;
+        Q[r].pb({l,i});
+    }
+    //PRE-PROCESSING
+    repe(i,n){
+        if(lastPos[a[i]]!=-1){
+            update(1,1,n,lastPos[a[i]],-1);
+        }
+        lastPos[a[i]]=i;
+        update(1,1,n,lastPos[a[i]],1);
+
+        for(auto &el:Q[i]){
+            l=el.ff;
+            r=i;
+            ans[el.ss]=query(1,1,n,l,r);
+        }
 
     }
-    repe(i,n)
-        cout<<a[i]<<" \n"[i==n];  
-  
+    repe(i,q)
+        cout<<ans[i]<<'\n';
  
 } 
  
@@ -137,7 +116,7 @@ int main() {
     time0 = curtime;
 
     int t=1;
-    cin>>t;
+    // cin>>t;
     repe(tt,t){
         //cout<<"Case #"<<tt<<": ";
         solve();

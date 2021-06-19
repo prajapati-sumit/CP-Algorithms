@@ -5,6 +5,7 @@ using namespace std;
 
 #define ull                 unsigned long long
 #define ll                  long long           
+#define int                 long long           
 #define pii                 pair<int, int>
 #define pll                 pair<ll, ll>
 #define pb                  push_back
@@ -25,7 +26,7 @@ using namespace std;
 #define INF                 1'000'000'000
 #define MD                  1'000'000'007
 #define MDL                 998244353
-#define MX                  200'05
+#define MX                  100'005
 
 
 auto time0 = curtime;
@@ -34,26 +35,12 @@ default_random_engine generator(rd());
 uniform_int_distribution<ull> distribution(0,0xFFFFFFFFFFFFFFFF);
 
 //Is testcase present?
-
-int segm[4*MX];
+ 
+ 
+int n;
 int a[MX];
-
- 
-void buildtree(int cur,int start,int end){
-     if(start==end){
-        segm[cur]=(a[start]==0);
-        return;
-     }
-     int mid=(start+end)>>1;
-     buildtree(cur<<1,start,mid);
-     buildtree((cur<<1)+1,mid+1,end);
-     //MERGING STEP
-     segm[cur]=segm[2*cur]+segm[2*cur+1];
-
- 
- 
- }
- int query(int cur,int start,int end,int qs,int qe){
+int segm[4*MX];
+int query(int cur,int start,int end,int qs,int qe){
      if(start>=qs && end<=qe)
          return segm[cur];
      if(start>qe || end<qs)
@@ -61,83 +48,75 @@ void buildtree(int cur,int start,int end){
      int mid=(start+end)>>1;
      int A=query(2*cur,start,mid,qs,qe);
      int B=query(2*cur+1,mid+1,end,qs,qe);
-     int res=A+B;                //MERGING STEP  
+     //MERGING STEP
+     int res=A+B; 
  
      return res;
 }
-int query2(int cur,int start,int end,int x){
-    if(start==end){
-        if(x==1 && segm[cur]==1)
-            return start;
-        assert(false);
-    }
-    int A=segm[2*cur],B=segm[2*cur+1];
-    int mid=(start+end)>>1;
-    if(A>=x)
-        return query2(2*cur,start,mid,x);
-
-    return query2(2*cur+1,mid+1,end,x-A);
-
-
-}
-void update(int cur,int start,int end,int ind){
-    if(start==ind && start==end){
-        segm[cur]=(a[ind]==0);
-        return;
-
-    }
-    if(start>ind|| end<ind)
-        return;          //OUT OF RANGE 
-    int mid=(start+end)>>1;
-    update(cur<<1,start,mid,ind);
-    update((cur<<1)^1,mid+1,end,ind);
-    //MERGING STEP
+ void update(int cur,int start,int end,int ind,int val){
+     if(start==ind && start==end){
+         //DO UPDATE
+        segm[cur]=val;
+         return;
+     }
+     if(start>ind|| end<ind)
+         return;          //OUT OF RANGE 
+     int mid=(start+end)>>1;
+     update(cur<<1,start,mid,ind,val);
+     update((cur<<1)^1,mid+1,end,ind,val);
     segm[cur]=segm[2*cur]+segm[2*cur+1];
-}
-   
- 
-void solve(){
-  
-    int n;
-    cin>>n;
-    if(n==1){
-        cout<<"1\n";
-        return;
-    }
-    repe(i,n)
-        a[i]=0;
-    buildtree(1,1,n);
-    a[2]=1;
-    update(1,1,n,2);
-    int cur=2;
-    FOR(i,2,n){
-        int req=i;
-        int before=query(1,1,n,1,cur);
-        int total=n-i+1;
-        int indx=(i+before+1)%total;
-        if(indx==0)
-            indx=total;
-        indx=query2(1,1,n,indx);
-        a[indx]=i;
-        cur=indx;
-        update(1,1,n,indx);
+     //MERGING STEP
+     
+ }
 
-    }
+void solve(){
+    int q;
+    cin>>n;
     repe(i,n)
-        cout<<a[i]<<" \n"[i==n];  
-  
+        cin>>a[i];
+    cin>>q;
+    sort(a+1,a+n+1);   
+    repe(i,n)
+        update(1,1,n,i,a[i]); 
+    repe(i,q){
+        int ql,qr;
+        cin>>ql>>qr;
+        int l=1,r=n;
+        int mid;
+        int l_ind=-1,r_ind=-1;
+        while(l<=r){
+            mid=(l+r)>>1;
+            if(a[mid]>=ql)
+                r=mid-1,l_ind=mid;
+            else
+                l=mid+1; 
+        }
+        l=l_ind;
+        r=n;
+        while(l<=r){
+            mid=(l+r)>>1;
+            if(a[mid]<=qr)
+                l=mid+1,r_ind=mid;
+            else
+                r=mid-1; 
+        }
+        assert(l_ind!=-1 && r_ind!=-1);
+        // cout<<l_ind<<" "<<r_ind<<'\n';
+        cout<<query(1,1,n,l_ind,r_ind)<<'\n';
+    }
+    
  
 } 
  
  
-int main() {
+int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
     time0 = curtime;
 
     int t=1;
-    cin>>t;
+    // cin>>t;
     repe(tt,t){
         //cout<<"Case #"<<tt<<": ";
         solve();

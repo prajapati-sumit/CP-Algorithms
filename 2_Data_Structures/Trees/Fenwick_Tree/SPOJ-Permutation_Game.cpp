@@ -1,10 +1,10 @@
-// AUTHOR: Sumit Prajapati      
+// AUTHOR: Sumit Prajapati
 #include <bits/stdc++.h>
 using namespace std;
 
 
 #define ull                 unsigned long long
-#define ll                  long long           
+#define ll                  long long
 #define pii                 pair<int, int>
 #define pll                 pair<ll, ll>
 #define pb                  push_back
@@ -25,7 +25,7 @@ using namespace std;
 #define INF                 1'000'000'000
 #define MD                  1'000'000'007
 #define MDL                 998244353
-#define MX                  200'05
+#define MX                  200'005
 
 
 auto time0 = curtime;
@@ -35,115 +35,73 @@ uniform_int_distribution<ull> distribution(0,0xFFFFFFFFFFFFFFFF);
 
 //Is testcase present?
 
+int fact[MX];
 int segm[4*MX];
-int a[MX];
-
- 
-void buildtree(int cur,int start,int end){
-     if(start==end){
-        segm[cur]=(a[start]==0);
-        return;
-     }
-     int mid=(start+end)>>1;
-     buildtree(cur<<1,start,mid);
-     buildtree((cur<<1)+1,mid+1,end);
-     //MERGING STEP
-     segm[cur]=segm[2*cur]+segm[2*cur+1];
-
- 
- 
- }
- int query(int cur,int start,int end,int qs,int qe){
-     if(start>=qs && end<=qe)
-         return segm[cur];
-     if(start>qe || end<qs)
-         return 0;          //INVALID RETURN 
-     int mid=(start+end)>>1;
-     int A=query(2*cur,start,mid,qs,qe);
-     int B=query(2*cur+1,mid+1,end,qs,qe);
-     int res=A+B;                //MERGING STEP  
- 
-     return res;
-}
-int query2(int cur,int start,int end,int x){
-    if(start==end){
-        if(x==1 && segm[cur]==1)
-            return start;
-        assert(false);
-    }
-    int A=segm[2*cur],B=segm[2*cur+1];
+int query(int cur,int start,int end,int qs,int qe){
+    if(start>=qs && end<=qe)
+        return segm[cur];
+    if(start>qe || end<qs)
+        return 0;          //INVALID RETURN 
     int mid=(start+end)>>1;
-    if(A>=x)
-        return query2(2*cur,start,mid,x);
+    int A=query(2*cur,start,mid,qs,qe);
+    int B=query(2*cur+1,mid+1,end,qs,qe);
+    //MERGING STEP
+    int res=A+B;  
 
-    return query2(2*cur+1,mid+1,end,x-A);
-
-
+    return res;
 }
-void update(int cur,int start,int end,int ind){
+void update(int cur,int start,int end,int ind,int val){
     if(start==ind && start==end){
-        segm[cur]=(a[ind]==0);
+        //DO UPDATE
+        segm[cur]=val;
         return;
-
     }
     if(start>ind|| end<ind)
         return;          //OUT OF RANGE 
     int mid=(start+end)>>1;
-    update(cur<<1,start,mid,ind);
-    update((cur<<1)^1,mid+1,end,ind);
-    //MERGING STEP
+    update(cur<<1,start,mid,ind,val);
+    update((cur<<1)^1,mid+1,end,ind,val);
     segm[cur]=segm[2*cur]+segm[2*cur+1];
+    
 }
-   
- 
+
 void solve(){
-  
+
     int n;
     cin>>n;
-    if(n==1){
-        cout<<"1\n";
-        return;
-    }
+    int a[n+1];
     repe(i,n)
-        a[i]=0;
-    buildtree(1,1,n);
-    a[2]=1;
-    update(1,1,n,2);
-    int cur=2;
-    FOR(i,2,n){
-        int req=i;
-        int before=query(1,1,n,1,cur);
-        int total=n-i+1;
-        int indx=(i+before+1)%total;
-        if(indx==0)
-            indx=total;
-        indx=query2(1,1,n,indx);
-        a[indx]=i;
-        cur=indx;
-        update(1,1,n,indx);
+        cin>>a[i];
+    int ans=0;
+    memset(segm,0,sizeof(segm));
+    for(int i=n;i>=1;i--){
+        int indx=n-i;
+        int small=query(1,1,n,1,a[i]);
+        // cout<<a[i]<<" "<<small<<" "<<fact[indx]<<'\n';
+        ans = ((ll)ans + (ll)fact[indx] * (small)) % MD;
+        update(1,1,n,a[i],1);
+    }
+    ans=(ans+1)%MD;
+    cout<<ans<<'\n';
+}
 
-    }
-    repe(i,n)
-        cout<<a[i]<<" \n"[i==n];  
-  
- 
-} 
- 
- 
+
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
     time0 = curtime;
-
+    fact[0]=1;
+    repe(i,MX-1)
+    fact[i]=((ll)i*fact[i-1])%MD;
     int t=1;
     cin>>t;
     repe(tt,t){
         //cout<<"Case #"<<tt<<": ";
         solve();
     }
-    
+
     //cerr<<"Execution Time: "<<timedif(time0,curtime)*1e-9<<" sec\n";
     return 0;
- 
+
 }
