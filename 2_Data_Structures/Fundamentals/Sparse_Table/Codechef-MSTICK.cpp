@@ -33,6 +33,7 @@ const int MAXLOG=18;
  
 int n,q;
 int a[MX];
+
 int sparsemin[MX][MAXLOG];
 int sparsemax[MX][MAXLOG];
 
