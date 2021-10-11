@@ -113,6 +113,7 @@ vector<int> lcp_construction(vector<int>& rank,string const& s, vector<int> cons
 void solve() {
 
     //sar ke upar se
+    // SKIPPED.
     string s;
     cin>>s;
 
